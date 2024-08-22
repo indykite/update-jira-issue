@@ -1,0 +1,18 @@
+name: 'Update Jira Issue'
+description: 'This action updates a Jira issue field with the given value. Do not forget to set the JIRA environment variables!!!'
+inputs:
+  issue_id:
+    description: 'Jira Issue ID'
+    required: true
+  new_value:
+    description: 'New Field Value'
+    required: true
+  field_id:
+    description: 'Field ID'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Run update_jira.bash script
+      run: ${{ github.action_path }}/send_request_to_jira.bash -i ${{ inputs.issue_id }} -f ${{ inputs.field_id }} -v ${{ inputs.new_value }}
+      shell: bash

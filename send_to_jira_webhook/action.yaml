@@ -1,0 +1,30 @@
+name: "Jira Web Hook"
+description: "Sends a webhook to Jira with the given parameters as data. Highly configurable."
+inputs:
+  jira-automation-webhook:
+    description: "Jira automation webhook url"
+    required: true
+  jira-issue-ids:
+    description: "A list of jira issue ids to send in the request"
+    required: false
+  request-data:
+    description: "The data to send in the jira body in json style"
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Create json and invoke webhook
+      run: |
+        json=$(jq -n \
+          --arg issues "${{ inputs.jira-issue-ids }}" \
+          --argjson data "${{ inputs.request-data }}" \
+          '{
+            issues: $issues | split(","),
+            data: $data
+          }')
+        echo "The body I'll send: ${json}"
+        curl -X POST \
+          -H "Content-Type: application/json" \
+          -d "$json" \
+          "${{ inputs.jira-automation-webhook }}"
+      shell: bash
