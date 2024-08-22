@@ -1,0 +1,32 @@
+name: "Issues from last release tag"
+description: "Gets all issues since the last release tag"
+inputs:
+  pattern:
+    description: "Pattern to search in the git log, usually it's the patter to find the issue. Eg: XXX-[0-9]+"
+    required: true
+outputs:
+  issues:
+    description: "The list of the found issues"
+    value: ${{ steps.collect-issues.outputs.issues }}
+runs:
+  using: "composite"
+  steps:
+    - name: Fetch entire Git history (including tags)
+      run: git fetch --prune --unshallow --tags
+      shell: bash
+
+    - name: Collect issue numbers since last release/tag
+      id: collect-issues
+      run: |
+        export LC_ALL=en_US.utf8
+        messages=`git --no-pager log --all --pretty=format:%B%N $(git tag --sort=-committerdate | head -1)...$(git tag --sort=-committerdate | head -2 | awk '{split($0, tags, "\n")} END {print tags[1]}')`
+        echo $messages
+        issues=`echo $messages | grep -oE "${{ inputs.pattern }}" | sort | uniq | sed 's/^\|$/"/g' | paste -sd , - `
+        retVal=$?
+        if [ $retVal -eq 0 ]; then
+          echo $issues
+          echo "issues=$issues" >> $GITHUB_OUTPUT
+        else
+          echo "issues=\"\"" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
