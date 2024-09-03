@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/indykite/update-jira-issue/compare/v1.0.0...v1.0.1) (2024-09-03)
+
+
+### Bug Fixes
+
+* remove --all from git log tags ([3ae214b](https://github.com/indykite/update-jira-issue/commit/3ae214b28258003b10a6e7a91d94c5289e2011c9))
+
 ## 1.0.0 (2024-08-22)
 
 
